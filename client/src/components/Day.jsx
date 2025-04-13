@@ -48,7 +48,7 @@ const Day = ({day, weekIndex}) => {
       </span>
       <div className="py-1">
         {dayEvent.map((event) => (
-          <div key={event.id} className={`text-xs font-mono mt-1 p-2 rounded ${dayColors[event.eventCategoryName]}`}>
+          <div key={event._id} className={`text-xs font-mono mt-1 p-2 rounded ${dayColors[event.eventCategoryName]}`}>
             {event.eventTitle}
           </div>
         ))}

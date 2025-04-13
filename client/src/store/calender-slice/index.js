@@ -1,5 +1,21 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import dayjs from "dayjs";
+
+export const fetchEvents = createAsyncThunk(
+    "calender/fetchEvents",
+    async () => {
+        console.log("Fetching events from server...");
+        const response = await fetch("/api/get-events", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        const data = await response.json();
+        return data;
+    }
+);
+
 
 const calenderSlice = createSlice({
     name: "calender", 
@@ -7,7 +23,9 @@ const calenderSlice = createSlice({
         month : dayjs().month(),
         showModel : false,
         selectedDate : dayjs().format(),
-        events : []
+        events : [],
+        isLoading: false,
+        error: null,
     },
     reducers: {
         incrementMonth: (state) => {
@@ -29,8 +47,23 @@ const calenderSlice = createSlice({
             state.selectedDate = action.payload.selectedDate;
         },
         saveEvent: (state, action) => {
-            state.events.push(action.payload.event)
+            const event = action.payload.event;
+            state.events.push(event);
+            
         },
+    },
+    extraReducers: (builder) => {
+        builder.addCase(fetchEvents.pending, (state) => {
+            state.isLoading = true;
+        });
+        builder.addCase(fetchEvents.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.events = action.payload;
+        });
+        builder.addCase(fetchEvents.rejected, (state, action) => {
+            state.isLoading = false;
+            state.error = action.error.message;
+        });
     }
 });
 
